@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Advanced Hunting Kusto utility</title>
+</head>
+
+<body>
+  <h2>Advanced Hunting Kusto utility</h2>
+  <div id="app">
+    <textarea id="iocs" v-model="iocs" rows="10" cols="100">
+      Domain Name,mailguardonline.net,T1192 - Spearphishing Link; T1528 - Steal Application Access Token,Office 365 Oauth token theft malicious domain,W1
+      Domain Name,cybersecuritiesinc.net,T1192 - Spearphishing Link,Credential harvesting malicious domain,W1
+      URL,https://api.onedrive.com/v1.0/shares/s!Ajp1Jcp4TBtmgRyuTf0Ow-_r40_x/driveitem/content,T1071 - Standard Application Layer Protocol; T1102 - Web Service,LibraryPSEPowerShell Empire OneDrive Listener,W1
+      URL,https://www.dropbox.com/s/qf15ewsstzk4qoz/Thesis%20Information%20to%20be%20referenced%20from.ppt?dl=0,T1102 - Web Service; T1192 - Spearphishing Link,Spearphishing link to malicious PowerPoint document,W1
+      Email Sender Address,rodriguesrosapriscila@gmail.com,T1193 - Spearphishing Attachment; T1187 - Forced Authentication,-,W1
+      Email Sender Address,rserranoer@gmail.com,T1192 - Spearphishing Link; T1193 - Spearphishing Attachment,-,W1
+      User Agent,Microsoft SkyDriveSync 17.005.0107.0008 ship; Windows NT 10.0 (16299),T1071 - Standard Application Layer Protocol; T1102 - Web Service,LibraryPSEPowerShell Empire HTTP user agent,W1
+      User Agent,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36",T1071 - Standard Application Layer Protocol; T1102 - Web Service,HTTPCore HTTP user agent,W1
+      File Name,%APPDATA%\Microsoft\Word\STARTUP\Template.dotm,T1064 - Scripting; T1137 - Office Application Startup,Malicious MS Word Template file containing LibraryPSE,W2
+      Folder Path,C:\Logs\PerfLogs,T1074 - Data Staged,Actor working/staging directory,W1
+      Folder Path,C:\ProgramData\.Lookup,T1074 - Data Staged,Actor working/staging directory,W1
+      IP/Port,127.0.0.1:6666,T1068 - Exploitation for Privilege Escalation,HTTPotato localhost IP/Port used in privilege escalation,W1
+      IP/Port,127.0.0.1:6667,T1068 - Exploitation for Privilege Escalation,HTTPotato localhost IP/Port used in privilege escalation,W1
+      IPv4 Address,104.156.233.219,T1190 - Exploit Public-Facing Application; T1100 - Web Shell; T1114 - Email Collection; T1071 - Standard Application Layer Protocol,-,W1
+      IPv4 Address,131.153.16.198,T1190 - Exploit Public-Facing Application; T1100 - Web Shell; T1114 - Email Collection; T1071 - Standard Application Layer Protocol,-,W1
+      File Name,jp.exe,T1068 - Exploitation for Privilege Escalation,JuicyPotato filename,W1
+      MD5 Hash,808502752ca0492aca995e9b620d507b,T1068 - Exploitation for Privilege Escalation,JuicyPotato jp.exe binary - hash matches version available for download on GitHub. Sample in VirusTotal.,W1
+      SHA256 Hash,0f56c703e9b7ddeb90646927bac05a5c6d95308c8e13b88e5d4f4b572423e036 ,T1068 - Exploitation for Privilege Escalation,JuicyPotato jp.exe binary - hash matches version available for download on GitHub. Sample in VirusTotal.,W1
+      File Name,TmDbgLog.dll,T1038 - DLL Search Order Hijacking; T1140 - Deobfuscate/Decode Files or Information,Actor DLL utilised to deobfuscate and load CobaltStrike payload,W1
+      MD5 Hash,67d735924a1c717ca8fc5e0b8f2973b0,T1038 - DLL Search Order Hijacking; T1140 - Deobfuscate/Decode Files or Information,TmDbgLog.dll - Actor DLL utilised to deobfuscate and load CobaltStrike payload. Sample in VirusTotal.,W1
+      SHA256 Hash,e84badc0eeacf3bf3a9e562662f05ebf05ab19196b740566a4e72a469460a55d,T1038 - DLL Search Order Hijacking; T1140 - Deobfuscate/Decode Files or Information,TmDbgLog.dll - Actor DLL utilised to deobfuscate and load CobaltStrike payload. Sample in VirusTotal.,W1
+    </textarea>
+    <h3>This page generates queries to hunt for events using the <a href="https://security.microsoft.com/hunting"
+        target="_blank">Microsoft 365 Security Advanced Hunting</a> portal.</h3>
+    <h4>Querying for suspicious emails by SenderFromAddress</h4>
+    <p v-on:click="select">
+      <code>EmailEvents <br>
+        | where SenderFromAddress in~ ("{{ indicators('Email').join('", "') }}") 
+        or SenderFromDomain endswith "{{ indicators('Domain').join('" or SenderFromDomain endswith "') }}"</code>
+    </p>
+    <h4>Querying for suspicious emails by URL</h4>
+    <p v-on:click="select">
+      <code>EmailUrlInfo <br>
+        | where Url contains "{{ indicators('URL').join('" or Url contains "') }}" <br>
+        | join (EmailEvents) on NetworkMessageId</code>
+    </p>
+    <h4>Querying for suspicious network activity by IP/Port</h4>
+    <p v-on:click="select">
+      <code>DeviceNetworkEvents<br>
+        | where RemoteIP in ("{{ indicators('IPv4').join('", "') }}") 
+        or RemotePort in ({{ ports.join(', ') }})</code>
+    </p>
+    <h4>Querying for suspicious file executions by name or hash</h4>
+    <p v-on:click="select">
+      <code>DeviceProcessEvents <br>| 
+        where FileName in ("{{ files.join('", "') }}") 
+        or InitiatingProcessFileName in ("{{ files.join('", "') }}") 
+        or MD5 in ("{{ indicators('MD5').join('", "') }}") 
+        or SHA256 in ("{{ indicators('SHA256').join('", "') }}")</code>
+    </p>
+    <h4>Querying for suspicious file executions by folder path</h4>
+    <p v-on:click="select">
+      <code>DeviceProcessEvents <br>| 
+        where FolderPath endswith "{{ folders.join('" or FolderPath endswith "') }}"
+        or InitiatingProcessFolderPath endswith "{{ folders.join('" or InitiatingProcessFolderPath endswith "') }}"</code>
+    </p>
+  </div>
+  <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+  <script>
+    new Vue({
+      el: "#app",
+      data() {
+        return {
+          iocs: document.getElementById("iocs").textContent,
+        };
+      },
+      methods: {
+        select(event) {
+          r = document.createRange(); r.selectNode(event.target.closest("p"));
+          s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        },
+        indicators(name, column) { return this.iocrows.filter(row => row.startsWith(name)).map(row => row.split(",")[1]) }
+      },
+      computed: {
+        iocrows() { return this.iocs.split('\n').map(row => row.trim()); },
+        ports() { return this.indicators("IP/Port").map(row => row.split(":")[1]); },
+        files() { return this.indicators("File Name").map(row => row.search("\\\\") > -1 ? row.split("\\").slice(-1) : row); }, // remove paths from files
+        folders() { return this.indicators("Folder").map(row => row.search("%") > -1 ? row.split("%").slice(-1) : row); } // remove variables from folders
+      }
+    });
+  </script>
+</body>
+
+</html>
