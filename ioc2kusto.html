@@ -85,7 +85,7 @@ SHA256 Hash,e84badc0eeacf3bf3a9e562662f05ebf05ab19196b740566a4e72a469460a55d,T10
           r = document.createRange(); r.selectNode(event.target.closest("p"));
           s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
         },
-        indicators(name, column) { return this.iocrows.filter(row => row.startsWith(name)).map(row => row.split(",")[1]) }
+        indicators(name, column) { return this.iocrows.filter(row => row.startsWith(name)).map(row => row.split(",")[1].replace("\\", "\\\\")) } // escape backslashes for kusto
       },
       computed: {
         iocrows() { return this.iocs.split('\n').map(row => row.trim()); },
