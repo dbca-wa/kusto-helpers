@@ -11,29 +11,30 @@
 <body>
   <h2>Advanced Hunting Kusto utility</h2>
   <div>This utility is open source. <a href="https://github.com/dbca-wa/kusto-helpers/edit/master/ioc2kusto.html">Edit on github</a>.</div>
+  <div>Usage: Paste an indicators of compromise list as a CSV below (sample is preloaded), click a generated query to select it. You can then copy and paste into MS threat hunting portal.</div>
   <div id="app">
     <textarea id="iocs" v-model="iocs" rows="10" cols="100">
-      Domain Name,mailguardonline.net,T1192 - Spearphishing Link; T1528 - Steal Application Access Token,Office 365 Oauth token theft malicious domain,W1
-      Domain Name,cybersecuritiesinc.net,T1192 - Spearphishing Link,Credential harvesting malicious domain,W1
-      URL,https://api.onedrive.com/v1.0/shares/s!Ajp1Jcp4TBtmgRyuTf0Ow-_r40_x/driveitem/content,T1071 - Standard Application Layer Protocol; T1102 - Web Service,LibraryPSEPowerShell Empire OneDrive Listener,W1
-      URL,https://www.dropbox.com/s/qf15ewsstzk4qoz/Thesis%20Information%20to%20be%20referenced%20from.ppt?dl=0,T1102 - Web Service; T1192 - Spearphishing Link,Spearphishing link to malicious PowerPoint document,W1
-      Email Sender Address,rodriguesrosapriscila@gmail.com,T1193 - Spearphishing Attachment; T1187 - Forced Authentication,-,W1
-      Email Sender Address,rserranoer@gmail.com,T1192 - Spearphishing Link; T1193 - Spearphishing Attachment,-,W1
-      User Agent,Microsoft SkyDriveSync 17.005.0107.0008 ship; Windows NT 10.0 (16299),T1071 - Standard Application Layer Protocol; T1102 - Web Service,LibraryPSEPowerShell Empire HTTP user agent,W1
-      User Agent,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36",T1071 - Standard Application Layer Protocol; T1102 - Web Service,HTTPCore HTTP user agent,W1
-      File Name,%APPDATA%\Microsoft\Word\STARTUP\Template.dotm,T1064 - Scripting; T1137 - Office Application Startup,Malicious MS Word Template file containing LibraryPSE,W2
-      Folder Path,C:\Logs\PerfLogs,T1074 - Data Staged,Actor working/staging directory,W1
-      Folder Path,C:\ProgramData\.Lookup,T1074 - Data Staged,Actor working/staging directory,W1
-      IP/Port,127.0.0.1:6666,T1068 - Exploitation for Privilege Escalation,HTTPotato localhost IP/Port used in privilege escalation,W1
-      IP/Port,127.0.0.1:6667,T1068 - Exploitation for Privilege Escalation,HTTPotato localhost IP/Port used in privilege escalation,W1
-      IPv4 Address,104.156.233.219,T1190 - Exploit Public-Facing Application; T1100 - Web Shell; T1114 - Email Collection; T1071 - Standard Application Layer Protocol,-,W1
-      IPv4 Address,131.153.16.198,T1190 - Exploit Public-Facing Application; T1100 - Web Shell; T1114 - Email Collection; T1071 - Standard Application Layer Protocol,-,W1
-      File Name,jp.exe,T1068 - Exploitation for Privilege Escalation,JuicyPotato filename,W1
-      MD5 Hash,808502752ca0492aca995e9b620d507b,T1068 - Exploitation for Privilege Escalation,JuicyPotato jp.exe binary - hash matches version available for download on GitHub. Sample in VirusTotal.,W1
-      SHA256 Hash,0f56c703e9b7ddeb90646927bac05a5c6d95308c8e13b88e5d4f4b572423e036 ,T1068 - Exploitation for Privilege Escalation,JuicyPotato jp.exe binary - hash matches version available for download on GitHub. Sample in VirusTotal.,W1
-      File Name,TmDbgLog.dll,T1038 - DLL Search Order Hijacking; T1140 - Deobfuscate/Decode Files or Information,Actor DLL utilised to deobfuscate and load CobaltStrike payload,W1
-      MD5 Hash,67d735924a1c717ca8fc5e0b8f2973b0,T1038 - DLL Search Order Hijacking; T1140 - Deobfuscate/Decode Files or Information,TmDbgLog.dll - Actor DLL utilised to deobfuscate and load CobaltStrike payload. Sample in VirusTotal.,W1
-      SHA256 Hash,e84badc0eeacf3bf3a9e562662f05ebf05ab19196b740566a4e72a469460a55d,T1038 - DLL Search Order Hijacking; T1140 - Deobfuscate/Decode Files or Information,TmDbgLog.dll - Actor DLL utilised to deobfuscate and load CobaltStrike payload. Sample in VirusTotal.,W1
+Domain Name,mailguardonline.net,T1192 - Spearphishing Link; T1528 - Steal Application Access Token,Office 365 Oauth token theft malicious domain,W1
+Domain Name,cybersecuritiesinc.net,T1192 - Spearphishing Link,Credential harvesting malicious domain,W1
+URL,https://api.onedrive.com/v1.0/shares/s!Ajp1Jcp4TBtmgRyuTf0Ow-_r40_x/driveitem/content,T1071 - Standard Application Layer Protocol; T1102 - Web Service,LibraryPSEPowerShell Empire OneDrive Listener,W1
+URL,https://www.dropbox.com/s/qf15ewsstzk4qoz/Thesis%20Information%20to%20be%20referenced%20from.ppt?dl=0,T1102 - Web Service; T1192 - Spearphishing Link,Spearphishing link to malicious PowerPoint document,W1
+Email Sender Address,rodriguesrosapriscila@gmail.com,T1193 - Spearphishing Attachment; T1187 - Forced Authentication,-,W1
+Email Sender Address,rserranoer@gmail.com,T1192 - Spearphishing Link; T1193 - Spearphishing Attachment,-,W1
+User Agent,Microsoft SkyDriveSync 17.005.0107.0008 ship; Windows NT 10.0 (16299),T1071 - Standard Application Layer Protocol; T1102 - Web Service,LibraryPSEPowerShell Empire HTTP user agent,W1
+User Agent,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36",T1071 - Standard Application Layer Protocol; T1102 - Web Service,HTTPCore HTTP user agent,W1
+File Name,%APPDATA%\Microsoft\Word\STARTUP\Template.dotm,T1064 - Scripting; T1137 - Office Application Startup,Malicious MS Word Template file containing LibraryPSE,W2
+Folder Path,C:\Logs\PerfLogs,T1074 - Data Staged,Actor working/staging directory,W1
+Folder Path,C:\ProgramData\.Lookup,T1074 - Data Staged,Actor working/staging directory,W1
+IP/Port,127.0.0.1:6666,T1068 - Exploitation for Privilege Escalation,HTTPotato localhost IP/Port used in privilege escalation,W1
+IP/Port,127.0.0.1:6667,T1068 - Exploitation for Privilege Escalation,HTTPotato localhost IP/Port used in privilege escalation,W1
+IPv4 Address,104.156.233.219,T1190 - Exploit Public-Facing Application; T1100 - Web Shell; T1114 - Email Collection; T1071 - Standard Application Layer Protocol,-,W1
+IPv4 Address,131.153.16.198,T1190 - Exploit Public-Facing Application; T1100 - Web Shell; T1114 - Email Collection; T1071 - Standard Application Layer Protocol,-,W1
+File Name,jp.exe,T1068 - Exploitation for Privilege Escalation,JuicyPotato filename,W1
+MD5 Hash,808502752ca0492aca995e9b620d507b,T1068 - Exploitation for Privilege Escalation,JuicyPotato jp.exe binary - hash matches version available for download on GitHub. Sample in VirusTotal.,W1
+SHA256 Hash,0f56c703e9b7ddeb90646927bac05a5c6d95308c8e13b88e5d4f4b572423e036 ,T1068 - Exploitation for Privilege Escalation,JuicyPotato jp.exe binary - hash matches version available for download on GitHub. Sample in VirusTotal.,W1
+File Name,TmDbgLog.dll,T1038 - DLL Search Order Hijacking; T1140 - Deobfuscate/Decode Files or Information,Actor DLL utilised to deobfuscate and load CobaltStrike payload,W1
+MD5 Hash,67d735924a1c717ca8fc5e0b8f2973b0,T1038 - DLL Search Order Hijacking; T1140 - Deobfuscate/Decode Files or Information,TmDbgLog.dll - Actor DLL utilised to deobfuscate and load CobaltStrike payload. Sample in VirusTotal.,W1
+SHA256 Hash,e84badc0eeacf3bf3a9e562662f05ebf05ab19196b740566a4e72a469460a55d,T1038 - DLL Search Order Hijacking; T1140 - Deobfuscate/Decode Files or Information,TmDbgLog.dll - Actor DLL utilised to deobfuscate and load CobaltStrike payload. Sample in VirusTotal.,W1
     </textarea>
     <h3>This page generates queries to hunt for events using the <a href="https://security.microsoft.com/hunting"
         target="_blank">Microsoft 365 Security Advanced Hunting</a> portal.</h3>
