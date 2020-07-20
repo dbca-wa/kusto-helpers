@@ -5,15 +5,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
   <title>Advanced Hunting Kusto utility</title>
 </head>
 
 <body>
-  <h2>Advanced Hunting Kusto utility</h2>
-  <div>This utility is open source. <a href="https://github.com/dbca-wa/kusto-helpers/edit/master/ioc2kusto.html">Edit on github</a>.</div>
-  <div>Usage: Paste an indicators of compromise list as a CSV below (sample is preloaded), click a generated query to select it. You can then copy and paste into MS threat hunting portal.</div>
-  <div id="app">
-    <textarea id="iocs" v-model="iocs" rows="10" cols="100">
+  <section class="section">
+    <div id="app" class="container">
+      <div class="columns">
+        <div class="column is-half">
+          <h2 class="title">Advanced Hunting Kusto utility</h2>
+          <p class="subtitle">This utility is open source. <a href="https://github.com/dbca-wa/kusto-helpers/edit/master/ioc2kusto.html">Edit on github</a>.</p>
+          <div class="notification is-light">Usage: Paste an indicators of compromise list as a CSV (sample is preloaded), click a generated
+              query to select it. You can then copy and paste into <a href="https://security.microsoft.com/hunting" target="_blank">
+                Microsoft 365 Security Advanced Hunting Portal</a></div>
+        </div>
+        <div class="column">
+          <textarea class="textarea" placeholder="Paste IOC's here..." id="iocs" v-model="iocs" rows="7">
 Indicator Type,Indicator,MITRE ATT&CK Technique (if applicable),Comments,Version Added/Updated
 Domain Name,mailguardonline.net,T1192 - Spearphishing Link; T1528 - Steal Application Access Token,Office 365 Oauth token theft malicious domain,W1
 Domain Name,cybersecuritiesinc.net,T1192 - Spearphishing Link,Credential harvesting malicious domain,W1
@@ -36,42 +44,60 @@ SHA256 Hash,0f56c703e9b7ddeb90646927bac05a5c6d95308c8e13b88e5d4f4b572423e036 ,T1
 File Name,TmDbgLog.dll,T1038 - DLL Search Order Hijacking; T1140 - Deobfuscate/Decode Files or Information,Actor DLL utilised to deobfuscate and load CobaltStrike payload,W1
 MD5 Hash,67d735924a1c717ca8fc5e0b8f2973b0,T1038 - DLL Search Order Hijacking; T1140 - Deobfuscate/Decode Files or Information,TmDbgLog.dll - Actor DLL utilised to deobfuscate and load CobaltStrike payload. Sample in VirusTotal.,W1
 SHA256 Hash,e84badc0eeacf3bf3a9e562662f05ebf05ab19196b740566a4e72a469460a55d,T1038 - DLL Search Order Hijacking; T1140 - Deobfuscate/Decode Files or Information,TmDbgLog.dll - Actor DLL utilised to deobfuscate and load CobaltStrike payload. Sample in VirusTotal.,W1
-    </textarea>
-    <h3>This page generates queries to hunt for events using the <a href="https://security.microsoft.com/hunting"
-        target="_blank">Microsoft 365 Security Advanced Hunting</a> portal.</h3>
-    <h4>Querying for suspicious emails by SenderFromAddress</h4>
-    <p v-on:click="select">
-      <code>EmailEvents <br>
-        | where SenderFromAddress in~ ("{{ indicators('Email').join('", "') }}") 
-        or SenderFromDomain endswith "{{ indicators('Domain').join('" or SenderFromDomain endswith "') }}"</code>
-    </p>
-    <h4>Querying for suspicious emails by URL</h4>
-    <p v-on:click="select">
-      <code>EmailUrlInfo <br>
-        | where Url contains "{{ indicators('URL').join('" or Url contains "') }}" <br>
-        | join (EmailEvents) on NetworkMessageId</code>
-    </p>
-    <h4>Querying for suspicious network activity by IP/Port</h4>
-    <p v-on:click="select">
-      <code>DeviceNetworkEvents<br>
-        | where RemoteIP in ("{{ indicators('IPv4').join('", "') }}") 
-        or RemotePort in ({{ ports.join(', ') }})</code>
-    </p>
-    <h4>Querying for suspicious file executions by name or hash</h4>
-    <p v-on:click="select">
-      <code>DeviceProcessEvents <br>| 
-        where FileName in ("{{ files.join('", "') }}") 
-        or InitiatingProcessFileName in ("{{ files.join('", "') }}") 
-        or MD5 in ("{{ indicators('MD5').join('", "') }}") 
-        or SHA256 in ("{{ indicators('SHA256').join('", "') }}")</code>
-    </p>
-    <h4>Querying for suspicious file executions by folder path</h4>
-    <p v-on:click="select">
-      <code>DeviceProcessEvents <br>| 
-        where FolderPath endswith "{{ folders.join('" or FolderPath endswith "') }}"
-        or InitiatingProcessFolderPath endswith "{{ folders.join('" or InitiatingProcessFolderPath endswith "') }}"</code>
-    </p>
-  </div>
+            </textarea>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column is-half">
+          <article class="panel">
+            <p class="panel-heading">Emails by SenderFromAddress or SenderFromDomain</p>
+            <p class="panel-block" v-on:click="select">
+              <code>EmailEvents <br>
+                    | where SenderFromAddress in~ ("{{ indicators('Email').join('", "') }}") 
+                    or SenderFromDomain endswith "{{ indicators('Domain').join('" or SenderFromDomain endswith "') }}"</code>
+            </p>
+          </article>
+          <article class="panel">
+            <p class="panel-heading">Emails by URL</p>
+            <p class="panel-block" v-on:click="select">
+              <code>EmailUrlInfo <br>
+                    | where Url contains "{{ indicators('URL').join('" or Url contains "') }}" <br>
+                    | join (EmailEvents) on NetworkMessageId</code>
+            </p>
+          </article>
+          <article class="panel">
+            <p class="panel-heading">Network activity by IP or Port</p>
+            <p class="panel-block" v-on:click="select">
+              <code>DeviceNetworkEvents<br>
+                    | where RemoteIP in ("{{ indicators('IPv4').join('", "') }}") 
+                    or RemotePort in ({{ ports.join(', ') }})</code>
+            </p>
+          </article>
+        </div>
+        <div class="column">
+          <article class="panel">
+            <p class="panel-heading">File executions by name or hash</p>
+            <p class="panel-block" v-on:click="select">
+              <code>DeviceProcessEvents <br>
+                    | where FileName in ("{{ files.join('", "') }}") 
+                    or InitiatingProcessFileName in ("{{ files.join('", "') }}") 
+                    or MD5 in ("{{ indicators('MD5').join('", "') }}") 
+                    or SHA256 in ("{{ indicators('SHA256').join('", "') }}")</code>
+            </p>
+          </article>
+          <article class="panel">
+            <p class="panel-heading">File executions by folder path</p>
+            <p class="panel-block" v-on:click="select">
+              <code>DeviceProcessEvents <br>
+                    | where FolderPath endswith "{{ folders.join('" or FolderPath endswith "') }}"
+                    or InitiatingProcessFolderPath endswith "{{ folders.join('" or InitiatingProcessFolderPath endswith "') }}"</code>
+            </p>
+          </article>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
   <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
   <script>
     new Vue({
